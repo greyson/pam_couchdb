@@ -11,12 +11,6 @@
 // Static helper functions
 //
 
-static size_t static_onHeader( void * d, size_t sz, size_t nm, void * self )
-{
-   Curl * curl = (Curl*)self;
-   return curl->onHeader( d, sz, nm );
-}
-
 //
 // Public methods
 //
@@ -54,10 +48,6 @@ bool Curl::checkAuthorized( char const * username,
    // Set the URL to which we post
    curl_easy_setopt( curl, CURLOPT_URL, url );
 
-   // Set the reading function for the headers
-   curl_easy_setopt( curl, CURLOPT_HEADERFUNCTION, & static_onHeader );
-   curl_easy_setopt( curl, CURLOPT_HEADERDATA, this );
-
    // Set the data to be posted
    curl_easy_setopt( curl, CURLOPT_POSTFIELDS, post );
 
@@ -74,32 +64,18 @@ bool Curl::checkAuthorized( char const * username,
    free( post );
    free( url );
 
+   long status = 500;
+   res = curl_easy_getinfo( curl, CURLINFO_RESPONSE_CODE, & status );
+   if( res != 0 )
+   {
+      free( post );
+      free( url );
+      throw std::runtime_error( "Could not perform lookup" );
+   }
+
    return status == 200;
 }
 
 //
 // Private methods
 //
-
-size_t Curl::onHeader( void * data, size_t size, size_t nMember )
-{
-   static std::string const httpheader = "HTTP/1.1";
-
-   // Get the status
-   std::string headerString( (char const *) data, size * nMember );
-   std::stringstream header( headerString );
-
-   std::string tok;
-   header >> tok;
-
-   if( tok == httpheader )
-   {
-      header >> status;
-   }
-   else
-   {
-      std::cout << "HEADER: " << headerString << std::endl;
-   }
-
-   return size * nMember;
-}

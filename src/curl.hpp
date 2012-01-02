@@ -19,13 +19,10 @@ public:
    //
 
    size_t readPost( void * data, size_t size, size_t nMember );
-   size_t onHeader( void * data, size_t size, size_t nMember );
 
 private:
    CURL * curl;
    std::string host;
-
-   int status;
 };
 
 #endif // __CPAM_CURL_HPP__
