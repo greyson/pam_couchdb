@@ -1,0 +1,37 @@
+#+TITLE: PAM module for authentication against CouchDB
+#+AUTHOR: Greyson Fischer
+#+COPYRIGHT: Copyright 2011 Greyson Fischer
+
+This is a very limited PAM module to authenticate a user against a
+running [[http://couchdb.apache.org/][CouchDB]] instance.  It is just a first hack -- a proof of
+concept -- at this point.  It occurred to me that CouchDB, with its
+distributed synchronization between hosts, would be an interesting
+way to authenticate a user to their machine.
+
+If two CouchDB instances are synchronized between two machines, a user
+on each machine will be able to log in with the same credentials,
+without requiring the know-how to set up an LDAP/Kerberos installation
+and will avoid the complications that those cause when, say SSH isn't
+linked for Kerberos.
+
+Additionally, if one of the group of machines is a laptop,
+synchronization of the databases means that the login credentials will
+still be available, even when the laptop is outside it's home
+network... I think my own personal motivation is made clear here.
+
+In this implementation, any user on the couchdb instance located at
+http://localhost:5984 may log in. I would like to add the following
+capabilities at some point in the near future:
+
+- Pass the couchdb URL in through PAM, rather than using hardcoded
+- Pass a 'role' in through PAM to which the user must be assigned to
+  be authenticated. Lack of a role argument indicates only login is
+  needed.
+
+Some other bits of functionality that I might add at some point, but
+which are not relevant to my situation:
+
+- Allow configuration of a username and password which can verify the
+  existence of the user before checking the password.
+- Add the cookie, passed back from authentication, to a session daemon
+  which can be used to broker pre-authenticated requests to/from CocuhDB.
