@@ -11,6 +11,11 @@
 // Static helper functions
 //
 
+static size_t discard_body( char *, size_t size, size_t nmemb, void * )
+{
+   return size * nmemb;
+}
+
 //
 // Public methods
 //
@@ -50,6 +55,11 @@ bool Curl::checkAuthorized( char const * username,
 
    // Set the data to be posted
    curl_easy_setopt( curl, CURLOPT_POSTFIELDS, post );
+
+   // Ensure that the incoming body is ignored, at this point, we only
+   // need the authentication header that proves that the user was
+   // either successfully authenticated, or not.
+   curl_easy_setopt( curl, CURLOPT_WRITEFUNCTION, & discard_body );
 
    // Perform the check
    CURLcode res = curl_easy_perform( curl );
