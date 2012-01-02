@@ -7,6 +7,7 @@
 extern "C"
 {
    PAM_EXTERN int pam_sm_authenticate( pam_handle_t *, int, int, char const ** );
+   PAM_EXTERN int pam_sm_setcred( pam_handle_t *, int, int, char const ** );
 }
 
 static char * _pam_delete( register char * xx )
@@ -127,4 +128,10 @@ int pam_sm_authenticate( pam_handle_t * pamh,
    }
 
    return PAM_USER_UNKNOWN;
+}
+
+int pam_sm_setcred( pam_handle_t * pamh, int flags,
+                    int argc, char const ** argv )
+{
+   return PAM_SUCCESS;
 }
