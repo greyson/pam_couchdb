@@ -2,6 +2,8 @@
 #+AUTHOR: Greyson Fischer
 #+COPYRIGHT: Copyright 2011 Greyson Fischer
 
+* What is pam_couchdb
+
 This is a very limited PAM module to authenticate a user against a
 running [[http://couchdb.apache.org/][CouchDB]] instance.  It is just a first hack -- a proof of
 concept -- at this point.  It occurred to me that CouchDB, with its
@@ -20,8 +22,22 @@ still be available, even when the laptop is outside it's home
 network... I think my own personal motivation is made clear here.
 
 In this implementation, any user on the couchdb instance located at
-http://localhost:5984 may log in. I would like to add the following
-capabilities at some point in the near future:
+http://localhost:5984 may log in.
+
+* Bugs in pam_couchdb
+
+** CouchDB wants to be first
+
+   It may just be the way I have it configured, but if I fail the
+   CouchDB login, I'm getting the system login second; This is not a
+   problem if CouchDB is the only authentication method, but I would
+   like to be able to allow a backup login (at least so that I don't
+   lock myself out of my own system!)
+
+* Things I want to do with pam_couchdb
+
+I would like to add the following capabilities at some point in the
+near future:
 
 - Pass the couchdb URL in through PAM, rather than using hardcoded
 - Pass a 'role' in through PAM to which the user must be assigned to
