@@ -3,7 +3,7 @@ add_library( pam_couch_lib STATIC
 )
 target_link_libraries( pam_couch_lib ${CURL_LIBRARIES} )
 
-add_library( pam_couch SHARED
+add_library( pam_couch MODULE
   pam.cpp
 )
 target_link_libraries( pam_couch pam_couch_lib )
