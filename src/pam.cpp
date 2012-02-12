@@ -49,6 +49,22 @@ static int converse( pam_handle_t * pamh,
    return retval;
 }
 
+#define CPAMARG_USEFIRSTPASS  0x02
+
+static int _pam_parse( int argc, char const ** argv )
+{
+   int ctrl;
+
+   for( ctrl = 0; argc-- > 0; ++argv )
+   {
+      // Check binary arguments
+      if( ! strcmp( *argv, "use_first_pass" ) )
+         ctrl |= CPAMARG_USEFIRSTPASS;
+   }
+
+   return ctrl;
+}
+
 static int conversation( pam_handle_t * pamh )
 {
    struct pam_message msg[2], *pmsg[2];
@@ -106,6 +122,9 @@ int pam_sm_authenticate( pam_handle_t * pamh,
    char const * username = NULL;
    char const * password = NULL;
 
+   // Parse arguments
+   int argmask = _pam_parse( argc, argv );
+
    // Get the username
    retval = pam_get_user( pamh, &username, NULL );
    if( (retval != PAM_SUCCESS) || (!username) )
@@ -113,11 +132,16 @@ int pam_sm_authenticate( pam_handle_t * pamh,
       return PAM_SERVICE_ERR;
    }
 
-   // Converse just to be sure we have a password
-   retval = conversation( pamh );
-   if( retval != PAM_SUCCESS )
+   // If we've been told to use the first pass, we don't converse with
+   // the user for a password.
+   if( ! argmask & CPAMARG_USEFIRSTPASS )
    {
-      return PAM_CONV_ERR;
+      // Converse just to be sure we have a password
+      retval = conversation( pamh );
+      if( retval != PAM_SUCCESS )
+      {
+         return PAM_CONV_ERR;
+      }
    }
 
    // Check if we got a password.  If use_authtok wasn't specified,
